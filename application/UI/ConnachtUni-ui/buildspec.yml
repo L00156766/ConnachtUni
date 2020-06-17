@@ -1,0 +1,93 @@
+version: 0.2
+
+phases:
+
+  install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    runtime-versions:
+      nodejs: 10
+      # name: version
+
+    commands:
+
+      # Verify the node.js install
+      - node -v
+
+      # Install the Angular CLI
+      - npm install -g @angular/cli
+      - ng --version
+
+      # Install puppeteer as a dev dependency
+      - npm i -D puppeteer
+      - npm i -D @angular-devkit/build-angular
+
+      # Upgrade apt
+      - apt-get upgrade
+
+      # Update libs
+      - apt-get update
+
+      # Install apt-transport-https
+      - apt-get install -y apt-transport-https
+
+      # Use apt to install the Chrome dependencies
+      - apt-get install -y libxcursor1
+      - apt-get install -y libgtk-3-dev
+      - apt-get install -y libxss1
+      - apt-get install -y libasound2
+      - apt-get install -y libnspr4
+      - apt-get install -y libnss3
+      - apt-get install -y libx11-xcb1
+
+      # Change to the appropriate directory
+      - echo $CODEBUILD_SRC_DIR 
+      - cd application/UI/ConnachtUni-ui
+      - pwd
+
+      # Install project dependencies
+      - npm install
+
+  #pre_build:
+    #commands:
+      # - command
+      # - command
+
+  build:
+    commands:
+    
+      # Build the project
+      - ng build
+
+      # Run headless Chrome tests
+      - ng test --code-coverage --watch=false
+
+      # List the build artifacts
+      - echo "List the contents of dist directory"
+      - ls -al ./dist/ConnachtUni-ui
+
+  #post_build:
+    #commands:
+      # - command
+      # - command
+      
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+    
+artifacts:
+  files:
+    - '**/*'
+    # - location
+  #name: $(date +%Y-%m-%d)
+  discard-paths: yes
+  base-directory: 'application/UI/ConnachtUni-ui/dist*'
+  
+#cache:
+  #paths:
+    # - paths
